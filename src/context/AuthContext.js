@@ -1,124 +1,69 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { createContext, useContext } from 'react';
+import { signIn, signOut, signUp, useSession } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const { data: session, isPending: loading } = useSession();
 
-  // Load user from localStorage on mount
-  useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('ideavault_user');
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-    } catch (error) {
-      console.error('Error loading user:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const user = session?.user ? {
+    id: session.user.id,
+    name: session.user.name,
+    email: session.user.email,
+    photoURL: session.user.image,
+  } : null;
 
-  // Save user to localStorage whenever it changes
-  const saveUser = (userData) => {
-    if (userData) {
-      localStorage.setItem('ideavault_user', JSON.stringify(userData));
-      localStorage.setItem('ideavault_token', userData.token || '');
-    } else {
-      localStorage.removeItem('ideavault_user');
-      localStorage.removeItem('ideavault_token');
-    }
-    setUser(userData);
-  };
-
-  // Register with email/password
+  // Register
   const registerWithEmail = async (name, email, photoURL, password) => {
-    setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, photoURL, password }),
+      const result = await signUp.email({
+        name,
+        email,
+        password,
+        image: photoURL || '',
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-      saveUser(data.user);
+      if (result.error) throw new Error(result.error.message);
       toast.success('Registration successful!');
-      return data;
+      return result;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || 'Registration failed');
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Login with email/password
+  // Login with email
   const loginWithEmail = async (email, password) => {
-    setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Login failed');
-      saveUser(data.user);
+      const result = await signIn.email({ email, password });
+      if (result.error) throw new Error(result.error.message);
       toast.success('Login successful!');
-      return data;
+      return result;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || 'Login failed');
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Google Login (placeholder — will wire up with Better Auth)
+  // Google login
   const loginWithGoogle = async () => {
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+      await signIn.social({
+        provider: 'google',
+        callbackURL: '/',
+      });
     } catch (error) {
       toast.error('Google login failed');
       throw error;
     }
   };
 
-  // Update profile
-  const updateProfile = async (updatedData) => {
-    try {
-      const token = localStorage.getItem('ideavault_token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedData),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Update failed');
-      saveUser({ ...user, ...updatedData, token });
-      toast.success('Profile updated!');
-      return data;
-    } catch (error) {
-      toast.error(error.message);
-      throw error;
-    }
-  };
-
   // Logout
-  const logout = () => {
-    saveUser(null);
+  const logout = async () => {
+    await signOut();
     toast.success('Logged out successfully!');
-    router.push('/');
   };
 
   const value = {
@@ -127,7 +72,6 @@ export function AuthProvider({ children }) {
     registerWithEmail,
     loginWithEmail,
     loginWithGoogle,
-    updateProfile,
     logout,
   };
 
