@@ -2,12 +2,26 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --surface: #f5f5f5;
+  --surface-2: #eeeeee;
+  --border: #e0e0e0;
+  --muted: #666666;
+  --primary: #000000;
+  --primary-hover: #222222;
+  --accent: #000000;
 }
 
 .dark {
   --background: #0a0a0a;
-  --foreground: #ededed;
+  --foreground: #ffffff;
+  --surface: #111111;
+  --surface-2: #1a1a1a;
+  --border: #222222;
+  --muted: #888888;
+  --primary: #ff2222;
+  --primary-hover: #cc0000;
+  --accent: #ff2222;
 }
 
 body {
@@ -19,18 +33,30 @@ body {
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
+  background: var(--border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Selection */
+::selection {
+  background: #000000;
+  color: #ffffff;
+}
+
+.dark ::selection {
+  background: #ff2222;
+  color: #ffffff;
 }

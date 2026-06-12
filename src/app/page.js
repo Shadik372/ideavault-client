@@ -7,30 +7,27 @@ const slides = [
   {
     title: 'Turn Your Ideas Into Reality',
     subtitle: 'Share your startup ideas with a community of innovators and get valuable feedback.',
-    bg: 'from-violet-600 to-indigo-600',
     emoji: '🚀',
   },
   {
     title: 'Discover Trending Startups',
     subtitle: 'Explore innovative ideas from entrepreneurs around the world and find your next inspiration.',
-    bg: 'from-indigo-600 to-blue-600',
     emoji: '💡',
   },
   {
     title: 'Collaborate & Validate',
     subtitle: 'Comment, discuss and help validate ideas through community interaction and feedback.',
-    bg: 'from-blue-600 to-cyan-600',
     emoji: '🤝',
   },
 ];
 
 const categories = [
-  { name: 'Technology', icon: '💻', count: 0 },
-  { name: 'Health', icon: '🏥', count: 0 },
-  { name: 'AI', icon: '🤖', count: 0 },
-  { name: 'Education', icon: '📚', count: 0 },
-  { name: 'Finance', icon: '💰', count: 0 },
-  { name: 'Environment', icon: '🌱', count: 0 },
+  { name: 'Technology', icon: '💻' },
+  { name: 'Health', icon: '🏥' },
+  { name: 'AI', icon: '🤖' },
+  { name: 'Education', icon: '📚' },
+  { name: 'Finance', icon: '💰' },
+  { name: 'Environment', icon: '🌱' },
 ];
 
 const steps = [
@@ -44,15 +41,14 @@ export default function HomePage() {
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Auto-play slides
   useEffect(() => {
+    document.title = 'IdeaVault - Startup Idea Sharing Platform';
     const timer = setInterval(() => {
       setCurrent(prev => (prev + 1) % slides.length);
     }, 4000);
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch trending ideas
   useEffect(() => {
     const fetchIdeas = async () => {
       try {
@@ -69,85 +65,95 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-black">
 
       {/* ── Banner ── */}
-      <section className="relative overflow-hidden">
-        <div className={`bg-gradient-to-br ${slides[current].bg} transition-all duration-700`}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-            <div className="text-center text-white">
-              <div className="text-7xl mb-6">{slides[current].emoji}</div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                {slides[current].title}
-              </h1>
-              <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
-                {slides[current].subtitle}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/ideas"
-                  className="px-8 py-4 bg-white text-violet-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
-                >
-                  Explore Ideas →
-                </Link>
-                <Link
-                  href="/add-idea"
-                  className="px-8 py-4 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl border border-white/30 transition-colors"
-                >
-                  Share Your Idea
-                </Link>
-              </div>
+      <section className="bg-black dark:bg-black relative overflow-hidden min-h-[560px] flex items-center">
+        {/* Red accent line */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
+          <div className="max-w-3xl">
+            <div className="text-6xl mb-6">{slides[current].emoji}</div>
+            <h1 className="text-5xl md:text-7xl font-black text-white leading-none tracking-tight mb-6">
+              {slides[current].title}
+            </h1>
+            <p className="text-lg text-white/60 max-w-xl mb-10 leading-relaxed">
+              {slides[current].subtitle}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/ideas"
+                className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold transition-colors text-sm"
+              >
+                Explore Ideas →
+              </Link>
+              <Link
+                href="/add-idea"
+                className="px-8 py-3 border border-white/20 hover:border-white/50 text-white font-bold transition-colors text-sm"
+              >
+                Share Your Idea
+              </Link>
             </div>
           </div>
         </div>
 
         {/* Slide indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-8 left-4 sm:left-8 lg:left-16 flex gap-2">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-2 rounded-full transition-all ${i === current ? 'w-8 bg-white' : 'w-2 bg-white/50'}`}
+              className={`h-0.5 transition-all duration-300 ${i === current ? 'w-8 bg-red-500' : 'w-4 bg-white/20 hover:bg-white/40'}`}
             />
           ))}
+        </div>
+
+        {/* Slide number */}
+        <div className="absolute bottom-6 right-8 text-white/20 font-black text-sm">
+          0{current + 1} / 0{slides.length}
         </div>
       </section>
 
       {/* ── Trending Ideas ── */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-950">
+      <section className="py-20 bg-white dark:bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-violet-600 font-semibold text-sm uppercase tracking-wider">Community Picks</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2">
-              Trending Ideas
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-xl mx-auto">
-              Discover the most exciting startup ideas shared by our community
-            </p>
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-red-600 font-bold text-xs uppercase tracking-widest mb-2">Community Picks</p>
+              <h2 className="text-3xl md:text-4xl font-black text-black dark:text-white leading-none">
+                Trending Ideas
+              </h2>
+            </div>
+            {ideas.length > 0 && (
+              <Link href="/ideas" className="text-sm font-bold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors hidden sm:block">
+                View all →
+              </Link>
+            )}
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10 dark:bg-white/10">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl p-6 animate-pulse">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                <div key={i} className="bg-white dark:bg-black p-6 animate-pulse">
+                  <div className="h-4 bg-black/10 dark:bg-white/10 w-1/3 mb-4"></div>
+                  <div className="h-6 bg-black/10 dark:bg-white/10 w-3/4 mb-3"></div>
+                  <div className="h-4 bg-black/10 dark:bg-white/10 w-full mb-2"></div>
+                  <div className="h-4 bg-black/10 dark:bg-white/10 w-2/3"></div>
                 </div>
               ))}
             </div>
           ) : ideas.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">💡</div>
-              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No ideas yet</h3>
-              <p className="text-gray-500 mb-6">Be the first to share a startup idea!</p>
-              <Link href="/add-idea" className="px-6 py-3 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors">
+            <div className="text-center py-20 border border-black/10 dark:border-white/10">
+              <div className="text-5xl mb-4">💡</div>
+              <h3 className="text-xl font-bold text-black dark:text-white mb-2">No ideas yet</h3>
+              <p className="text-black/50 dark:text-white/50 mb-6">Be the first to share a startup idea!</p>
+              <Link href="/add-idea" className="px-6 py-2.5 bg-black dark:bg-red-600 text-white font-bold text-sm hover:bg-black/80 dark:hover:bg-red-700 transition-colors">
                 Share an Idea
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10 dark:bg-white/10">
               {ideas.map((idea) => (
                 <IdeaCard key={idea._id} idea={idea} />
               ))}
@@ -155,12 +161,9 @@ export default function HomePage() {
           )}
 
           {ideas.length > 0 && (
-            <div className="text-center mt-12">
-              <Link
-                href="/ideas"
-                className="px-8 py-3 border-2 border-violet-600 text-violet-600 hover:bg-violet-600 hover:text-white font-semibold rounded-xl transition-colors"
-              >
-                View All Ideas
+            <div className="text-center mt-12 sm:hidden">
+              <Link href="/ideas" className="text-sm font-bold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
+                View all ideas →
               </Link>
             </div>
           )}
@@ -168,26 +171,24 @@ export default function HomePage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="py-20 bg-white dark:bg-gray-900">
+      <section className="py-20 bg-black dark:bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-violet-600 font-semibold text-sm uppercase tracking-wider">Simple Process</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2">
+          <div className="mb-16">
+            <p className="text-red-500 font-bold text-xs uppercase tracking-widest mb-2">Simple Process</p>
+            <h2 className="text-3xl md:text-4xl font-black text-white leading-none">
               How It Works
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-xl mx-auto">
-              Three simple steps to share and validate your startup idea
-            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10">
             {steps.map((step, i) => (
-              <div key={i} className="relative text-center p-8 rounded-2xl bg-gray-50 dark:bg-gray-800 hover:shadow-lg transition-shadow">
-                <div className="text-5xl mb-4">{step.icon}</div>
-                <div className="absolute top-4 right-4 text-4xl font-bold text-gray-100 dark:text-gray-700">
+              <div key={i} className="bg-black p-8 relative group hover:bg-white/5 transition-colors">
+                <div className="text-6xl font-black text-white/5 absolute top-4 right-6 select-none">
                   {step.step}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{step.title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                <div className="text-3xl mb-6">{step.icon}</div>
+                <h3 className="text-lg font-black text-white mb-3">{step.title}</h3>
+                <p className="text-white/40 text-sm leading-relaxed">{step.desc}</p>
+                <div className="w-8 h-0.5 bg-red-600 mt-6"></div>
               </div>
             ))}
           </div>
@@ -195,26 +196,25 @@ export default function HomePage() {
       </section>
 
       {/* ── Categories ── */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-950">
+      <section className="py-20 bg-white dark:bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-violet-600 font-semibold text-sm uppercase tracking-wider">Browse By Topic</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2">
+          <div className="mb-12">
+            <p className="text-red-600 font-bold text-xs uppercase tracking-widest mb-2">Browse By Topic</p>
+            <h2 className="text-3xl md:text-4xl font-black text-black dark:text-white leading-none">
               Explore Categories
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-xl mx-auto">
-              Find ideas that match your interests and expertise
-            </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-black/10 dark:bg-white/10">
             {categories.map((cat, i) => (
               <Link
                 key={i}
                 href={`/ideas?category=${cat.name}`}
-                className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-900 rounded-2xl hover:shadow-md hover:scale-105 transition-all border border-gray-100 dark:border-gray-800"
+                className="flex flex-col items-center gap-3 p-8 bg-white dark:bg-black hover:bg-black dark:hover:bg-white group transition-colors"
               >
-                <span className="text-4xl">{cat.icon}</span>
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{cat.name}</span>
+                <span className="text-3xl">{cat.icon}</span>
+                <span className="text-sm font-bold text-black dark:text-white group-hover:text-white dark:group-hover:text-black transition-colors">
+                  {cat.name}
+                </span>
               </Link>
             ))}
           </div>
@@ -227,53 +227,51 @@ export default function HomePage() {
 
 function IdeaCard({ idea }) {
   const categoryColors = {
-    Tech: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    Health: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    AI: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-    Education: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-    Finance: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-    Environment: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+    Tech: 'text-blue-600 dark:text-blue-400',
+    Health: 'text-green-600 dark:text-green-400',
+    AI: 'text-purple-600 dark:text-purple-400',
+    Education: 'text-yellow-600 dark:text-yellow-400',
+    Finance: 'text-emerald-600 dark:text-emerald-400',
+    Environment: 'text-teal-600 dark:text-teal-400',
   };
 
-  const colorClass = categoryColors[idea.category] || 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+  const colorClass = categoryColors[idea.category] || 'text-black/50 dark:text-white/50';
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col">
-      {/* Category + Date */}
+    <div className="bg-white dark:bg-black p-6 flex flex-col group hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors">
       <div className="flex items-center justify-between mb-4">
-        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colorClass}`}>
+        <span className={`text-xs font-bold uppercase tracking-wider ${colorClass}`}>
           {idea.category}
         </span>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-black/30 dark:text-white/30">
           {new Date(idea.createdAt).toLocaleDateString()}
         </span>
       </div>
 
-      {/* Title */}
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+      <h3 className="text-base font-black text-black dark:text-white mb-2 line-clamp-2 leading-snug">
         {idea.title}
       </h3>
 
-      {/* Description */}
-      <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-3 flex-1 mb-4">
+      <p className="text-black/50 dark:text-white/50 text-sm line-clamp-3 flex-1 mb-4 leading-relaxed">
         {idea.shortDescription}
       </p>
 
-      {/* Author + Button */}
-      <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between pt-4 border-t border-black/10 dark:border-white/10">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-            <span className="text-xs font-bold text-violet-600">
+          <div className="w-6 h-6 bg-black dark:bg-red-600 flex items-center justify-center">
+            <span className="text-white text-xs font-black">
               {idea.authorName?.charAt(0)?.toUpperCase() || '?'}
             </span>
           </div>
-          <span className="text-xs text-gray-500 truncate max-w-24">{idea.authorName}</span>
+          <span className="text-xs font-semibold text-black/50 dark:text-white/50 truncate max-w-20">
+            {idea.authorName}
+          </span>
         </div>
         <Link
           href={`/ideas/${idea._id}`}
-          className="text-xs font-semibold text-violet-600 hover:text-violet-700 flex items-center gap-1"
+          className="text-xs font-bold text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 transition-colors"
         >
-          View Details →
+          View →
         </Link>
       </div>
     </div>
