@@ -17,7 +17,7 @@ const categoryColors = {
 export default function IdeaDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, getToken } = useAuth();
 
   const [idea, setIdea] = useState(null);
   const [comments, setComments] = useState([]);
@@ -66,9 +66,13 @@ export default function IdeaDetailsPage() {
     if (!commentText.trim()) return;
     setSubmittingComment(true);
     try {
+      const token = await getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({
           ideaId: id,
           text: commentText.trim(),
@@ -91,9 +95,13 @@ export default function IdeaDetailsPage() {
   const handleEditComment = async (commentId) => {
     if (!editText.trim()) return;
     try {
+      const token = await getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comments/${commentId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ text: editText.trim() }),
       });
       if (!res.ok) throw new Error('Failed to update comment');
@@ -108,8 +116,12 @@ export default function IdeaDetailsPage() {
 
   const handleDeleteComment = async (commentId) => {
     try {
+      const token = await getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comments/${commentId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       if (!res.ok) throw new Error('Failed to delete comment');
       toast.success('Comment deleted!');
@@ -153,37 +165,18 @@ export default function IdeaDetailsPage() {
 
         {/* Idea Card */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden mb-8">
-
-          {/* Image */}
           {idea.imageURL && (
-            <img
-              src={idea.imageURL}
-              alt={idea.title}
-              className="w-full h-64 object-cover"
-              onError={(e) => e.target.style.display = 'none'}
-            />
+            <img src={idea.imageURL} alt={idea.title} className="w-full h-64 object-cover" onError={(e) => e.target.style.display = 'none'} />
           )}
-
           <div className="p-8">
-            {/* Category + Date */}
             <div className="flex items-center justify-between mb-4">
-              <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colorClass}`}>
-                {idea.category}
-              </span>
+              <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colorClass}`}>{idea.category}</span>
               <span className="text-xs text-gray-400">
                 {new Date(idea.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </span>
             </div>
-
-            {/* Title */}
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              {idea.title}
-            </h1>
-
-            {/* Short Description */}
-            <p className="text-lg text-gray-500 dark:text-gray-400 mb-6">
-              {idea.shortDescription}
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">{idea.title}</h1>
+            <p className="text-lg text-gray-500 dark:text-gray-400 mb-6">{idea.shortDescription}</p>
 
             {/* Author */}
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
@@ -204,9 +197,7 @@ export default function IdeaDetailsPage() {
             {idea.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {idea.tags.map((tag, i) => (
-                  <span key={i} className="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-full">
-                    #{tag}
-                  </span>
+                  <span key={i} className="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-full">#{tag}</span>
                 ))}
               </div>
             )}
@@ -319,11 +310,8 @@ export default function IdeaDetailsPage() {
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{comment.userName}</span>
-                        <span className="text-xs text-gray-400">
-                          {new Date(comment.createdAt).toLocaleDateString()}
-                        </span>
+                        <span className="text-xs text-gray-400">{new Date(comment.createdAt).toLocaleDateString()}</span>
                       </div>
-
                       {editingComment === comment._id ? (
                         <div>
                           <textarea
@@ -333,40 +321,18 @@ export default function IdeaDetailsPage() {
                             className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none text-sm"
                           />
                           <div className="flex gap-2 mt-2">
-                            <button
-                              onClick={() => handleEditComment(comment._id)}
-                              className="px-3 py-1.5 bg-violet-600 text-white text-xs rounded-lg hover:bg-violet-700 transition-colors"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => { setEditingComment(null); setEditText(''); }}
-                              className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 transition-colors"
-                            >
-                              Cancel
-                            </button>
+                            <button onClick={() => handleEditComment(comment._id)} className="px-3 py-1.5 bg-violet-600 text-white text-xs rounded-lg hover:bg-violet-700 transition-colors">Save</button>
+                            <button onClick={() => { setEditingComment(null); setEditText(''); }} className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
                           </div>
                         </div>
                       ) : (
                         <p className="text-gray-700 dark:text-gray-300 text-sm">{comment.text}</p>
                       )}
                     </div>
-
-                    {/* Edit/Delete — only for own comments */}
                     {user?.email === comment.userEmail && editingComment !== comment._id && (
                       <div className="flex gap-3 mt-1 ml-1">
-                        <button
-                          onClick={() => { setEditingComment(comment._id); setEditText(comment.text); }}
-                          className="text-xs text-gray-400 hover:text-violet-600 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirm(comment._id)}
-                          className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-                        >
-                          Delete
-                        </button>
+                        <button onClick={() => { setEditingComment(comment._id); setEditText(comment.text); }} className="text-xs text-gray-400 hover:text-violet-600 transition-colors">Edit</button>
+                        <button onClick={() => setDeleteConfirm(comment._id)} className="text-xs text-gray-400 hover:text-red-500 transition-colors">Delete</button>
                       </div>
                     )}
                   </div>
@@ -382,22 +348,10 @@ export default function IdeaDetailsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Delete Comment</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-              Are you sure you want to delete this comment? This action cannot be undone.
-            </p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Are you sure you want to delete this comment? This action cannot be undone.</p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2.5 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDeleteComment(deleteConfirm)}
-                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium"
-              >
-                Delete
-              </button>
+              <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium">Cancel</button>
+              <button onClick={() => handleDeleteComment(deleteConfirm)} className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium">Delete</button>
             </div>
           </div>
         </div>

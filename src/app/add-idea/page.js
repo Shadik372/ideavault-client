@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const CATEGORIES = ['Tech', 'Health', 'AI', 'Education', 'Finance', 'Environment', 'Other'];
 
 export default function AddIdeaPage() {
-  const { user } = useAuth();
+  const { user, getToken } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -56,6 +56,7 @@ export default function AddIdeaPage() {
     }
     setIsLoading(true);
     try {
+      const token = await getToken();
       const ideaData = {
         ...formData,
         authorEmail: user.email,
@@ -64,7 +65,10 @@ export default function AddIdeaPage() {
       };
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ideas`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(ideaData),
       });
       if (!res.ok) throw new Error('Failed to submit idea');
@@ -97,7 +101,6 @@ export default function AddIdeaPage() {
               Basic Information
             </h2>
 
-            {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Idea Title <span className="text-red-500">*</span>
@@ -112,7 +115,6 @@ export default function AddIdeaPage() {
               />
             </div>
 
-            {/* Short Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Short Description <span className="text-red-500">*</span>
@@ -129,7 +131,6 @@ export default function AddIdeaPage() {
               <p className="text-xs text-gray-400 mt-1 text-right">{formData.shortDescription.length}/150</p>
             </div>
 
-            {/* Detailed Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Detailed Description
@@ -144,7 +145,6 @@ export default function AddIdeaPage() {
               />
             </div>
 
-            {/* Category */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category <span className="text-red-500">*</span>
@@ -162,7 +162,6 @@ export default function AddIdeaPage() {
               </select>
             </div>
 
-            {/* Tags */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Tags <span className="text-gray-400 font-normal">(optional, max 5)</span>
@@ -196,7 +195,6 @@ export default function AddIdeaPage() {
               )}
             </div>
 
-            {/* Image URL */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Image URL <span className="text-gray-400 font-normal">(optional)</span>
@@ -214,7 +212,6 @@ export default function AddIdeaPage() {
               )}
             </div>
 
-            {/* Estimated Budget */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Estimated Budget <span className="text-gray-400 font-normal">(optional)</span>
@@ -236,7 +233,6 @@ export default function AddIdeaPage() {
               Problem & Solution
             </h2>
 
-            {/* Target Audience */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Target Audience <span className="text-red-500">*</span>
@@ -251,7 +247,6 @@ export default function AddIdeaPage() {
               />
             </div>
 
-            {/* Problem Statement */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Problem Statement <span className="text-red-500">*</span>
@@ -266,7 +261,6 @@ export default function AddIdeaPage() {
               />
             </div>
 
-            {/* Proposed Solution */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Proposed Solution <span className="text-red-500">*</span>
@@ -282,7 +276,6 @@ export default function AddIdeaPage() {
             </div>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={isLoading}
