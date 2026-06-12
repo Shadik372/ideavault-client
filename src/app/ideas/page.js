@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -51,10 +51,7 @@ function IdeaCard({ idea }) {
           </div>
           <span className="text-xs text-gray-500 truncate max-w-24">{idea.authorName}</span>
         </div>
-        <Link
-          href={`/ideas/${idea._id}`}
-          className="text-xs font-semibold text-violet-600 hover:text-violet-700"
-        >
+        <Link href={`/ideas/${idea._id}`} className="text-xs font-semibold text-violet-600 hover:text-violet-700">
           View Details →
         </Link>
       </div>
@@ -84,7 +81,7 @@ function SkeletonCard() {
   );
 }
 
-export default function IdeasPage() {
+function IdeasContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -132,8 +129,6 @@ export default function IdeasPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-
-      {/* Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
@@ -142,8 +137,6 @@ export default function IdeasPage() {
           <p className="text-gray-500 dark:text-gray-400">
             Discover innovative startup ideas from our community
           </p>
-
-          {/* Search */}
           <form onSubmit={handleSearch} className="mt-6 flex gap-3 max-w-xl">
             <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,10 +150,7 @@ export default function IdeasPage() {
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
               />
             </div>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition-colors"
-            >
+            <button type="submit" className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition-colors">
               Search
             </button>
           </form>
@@ -168,8 +158,6 @@ export default function IdeasPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        {/* Category Filter */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => (
             <button
@@ -186,7 +174,6 @@ export default function IdeasPage() {
           ))}
         </div>
 
-        {/* Results count */}
         {!loading && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             Showing <span className="font-semibold text-gray-900 dark:text-white">{ideas.length}</span> ideas
@@ -194,7 +181,6 @@ export default function IdeasPage() {
           </p>
         )}
 
-        {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
@@ -220,5 +206,17 @@ export default function IdeasPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function IdeasPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-violet-600 border-t-transparent rounded-full"></div>
+      </div>
+    }>
+      <IdeasContent />
+    </Suspense>
   );
 }
