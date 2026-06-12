@@ -14,16 +14,18 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await loginWithEmail(email, password);
-      router.push('/');
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  e.preventDefault();
+  setIsLoading(true);
+  try {
+    await loginWithEmail(email, password);
+    const params = new URLSearchParams(window.location.search);
+    const callbackUrl = params.get('callbackUrl') || '/';
+    router.push(callbackUrl);
+  } catch (error) {
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleGoogle = async () => {
     try {
