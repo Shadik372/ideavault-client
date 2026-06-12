@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
 
   const generateJWT = async (email, name) => {
     try {
-      const res = await fetch('http://localhost:5000/api/jwt/token', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jwt/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name }),
