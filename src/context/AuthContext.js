@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { signIn, signOut, signUp, useSession } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 
@@ -8,13 +8,22 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const { data: session, isPending: loading } = useSession();
+  const [user, setUser] = useState(null);
 
-  const user = session?.user ? {
-    id: session.user.id,
-    name: session.user.name,
-    email: session.user.email,
-    photoURL: session.user.image,
-  } : null;
+  // Update user state when session changes
+  useEffect(() => {
+    if (session?.user) {
+      const userData = {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        photoURL: session.user.image || session.user.photoURL || null,
+      };
+      setUser(userData);
+    } else if (!loading) {
+      setUser(null);
+    }
+  }, [session, loading]);
 
   const getToken = async () => {
     try {
@@ -26,7 +35,8 @@ export function AuthProvider({ children }) {
 
   const generateJWT = async (email, name) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jwt/token`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/jwt/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name }),
@@ -42,10 +52,21 @@ export function AuthProvider({ children }) {
 
   const registerWithEmail = async (name, email, photoURL, password) => {
     try {
-      const result = await signUp.email({ name, email, password, image: photoURL || '' });
+      const result = await signUp.email({ 
+        name, 
+        email, 
+        password, 
+        image: photoURL || '' 
+      });
+      
       if (result.error) throw new Error(result.error.message);
+      
       await generateJWT(email, name);
       toast.success('Registration successful!');
+      
+      // Refresh the page to update session
+      window.location.href = '/';
+      
       return result;
     } catch (error) {
       toast.error(error.message || 'Registration failed');
@@ -56,9 +77,15 @@ export function AuthProvider({ children }) {
   const loginWithEmail = async (email, password) => {
     try {
       const result = await signIn.email({ email, password });
+      
       if (result.error) throw new Error(result.error.message);
+      
       await generateJWT(email, result.data?.user?.name || '');
       toast.success('Login successful!');
+      
+      // Refresh the page to update session
+      window.location.href = '/';
+      
       return result;
     } catch (error) {
       toast.error(error.message || 'Login failed');
@@ -68,7 +95,10 @@ export function AuthProvider({ children }) {
 
   const loginWithGoogle = async () => {
     try {
-      await signIn.social({ provider: 'google', callbackURL: '/' });
+      await signIn.social({ 
+        provider: 'google', 
+        callbackURL: window.location.origin 
+      });
     } catch (error) {
       toast.error('Google login failed');
       throw error;
@@ -76,13 +106,27 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await signOut();
-    localStorage.removeItem('ideavault_jwt');
-    toast.success('Logged out successfully!');
+    try {
+      await signOut();
+      localStorage.removeItem('ideavault_jwt');
+      setUser(null);
+      toast.success('Logged out successfully!');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, getToken, registerWithEmail, loginWithEmail, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      getToken, 
+      registerWithEmail, 
+      loginWithEmail, 
+      loginWithGoogle, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

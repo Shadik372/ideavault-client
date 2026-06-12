@@ -13,9 +13,11 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, [user, loading]);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -29,9 +31,32 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/');
     setDropdownOpen(false);
+    router.push('/');
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <nav className="sticky top-0 z-50 bg-white dark:bg-black border-b border-black/10 dark:border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-black dark:bg-red-600 flex items-center justify-center">
+                <span className="text-white font-black text-xs">IV</span>
+              </div>
+              <span className="font-black text-lg tracking-tight text-black dark:text-white">
+                Idea<span className="text-red-600 dark:text-red-500">Vault</span>
+              </span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-white dark:bg-black border-b border-black/10 dark:border-white/10">
@@ -111,23 +136,31 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="w-8 h-8 border border-black/20 dark:border-white/20 overflow-hidden hover:border-black dark:hover:border-red-500 transition-colors"
+                  className="w-8 h-8 rounded-full border-2 border-black/20 dark:border-white/20 overflow-hidden hover:border-black dark:hover:border-red-500 transition-all flex items-center justify-center bg-black dark:bg-red-600"
+                  title={user.name || 'User'}
                 >
                   {user.photoURL ? (
-                    <img src={user.photoURL} alt={user.name} className="w-full h-full object-cover" />
+                    <img 
+                      src={user.photoURL} 
+                      alt={user.name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
                   ) : (
-                    <div className="w-full h-full bg-black dark:bg-red-600 flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">{user.name?.charAt(0)?.toUpperCase()}</span>
-                    </div>
+                    <span className="text-white text-sm font-bold">
+                      {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || '?'}
+                    </span>
                   )}
                 </button>
 
                 {dropdownOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)}></div>
-                    <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-black border border-black/10 dark:border-white/10 z-50 shadow-lg">
+                    <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-lg shadow-xl z-50">
                       <div className="px-4 py-3 border-b border-black/10 dark:border-white/10">
-                        <p className="text-sm font-bold text-black dark:text-white truncate">{user.name}</p>
+                        <p className="text-sm font-bold text-black dark:text-white truncate">{user.name || 'User'}</p>
                         <p className="text-xs text-black/50 dark:text-white/50 truncate">{user.email}</p>
                       </div>
                       <div className="py-1">
