@@ -14,6 +14,7 @@ export default function MyInteractionsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = 'My Interactions | IdeaVault';
     if (!authLoading && !user) {
       router.push('/login');
       return;

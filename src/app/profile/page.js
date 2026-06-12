@@ -16,6 +16,7 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
+    document.title = 'Profile | IdeaVault';
     if (!authLoading && !user) {
       router.push('/login');
       return;

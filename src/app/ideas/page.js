@@ -96,6 +96,7 @@ export default function IdeasPage() {
   );
 
   useEffect(() => {
+    document.title = 'Explore Ideas | IdeaVault';
     fetchIdeas();
   }, [selectedCategory]);
 

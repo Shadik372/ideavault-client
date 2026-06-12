@@ -43,6 +43,8 @@ export default function IdeaDetailsPage() {
       if (!res.ok) throw new Error('Idea not found');
       const data = await res.json();
       setIdea(data);
+
+      document.title = `${data.title} | IdeaVault`;
     } catch (error) {
       toast.error('Failed to load idea');
       router.push('/ideas');

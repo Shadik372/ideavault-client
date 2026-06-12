@@ -28,6 +28,7 @@ export default function MyIdeasPage() {
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
+    document.title = 'My Ideas | IdeaVault';
     if (!authLoading && !user) {
       router.push('/login');
       return;
