@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import toast from 'react-hot-toast';
 
+const inputClass = 'w-full px-4 py-3 border border-black/20 dark:border-white/20 bg-white dark:bg-black text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-black dark:focus:border-white text-sm transition-colors';
+const labelClass = 'block text-xs font-bold text-black/60 dark:text-white/60 uppercase tracking-wider mb-2';
+
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    image: '',
-  });
+  const [formData, setFormData] = useState({ name: '', image: '' });
 
   useEffect(() => {
     document.title = 'Profile | IdeaVault';
@@ -22,10 +22,7 @@ export default function ProfilePage() {
       return;
     }
     if (user) {
-      setFormData({
-        name: user.name || '',
-        image: user.photoURL || '',
-      });
+      setFormData({ name: user.name || '', image: user.photoURL || '' });
     }
   }, [user, authLoading]);
 
@@ -38,12 +35,9 @@ export default function ProfilePage() {
     setIsLoading(true);
     try {
       const { authClient } = await import('@/lib/auth-client');
-      const result = await authClient.updateUser({
-        name: formData.name,
-        image: formData.image,
-      });
+      const result = await authClient.updateUser({ name: formData.name, image: formData.image });
       if (result.error) throw new Error(result.error.message);
-      toast.success('Profile updated successfully!');
+      toast.success('Profile updated!');
       setIsEditing(false);
     } catch (error) {
       toast.error(error.message || 'Failed to update profile');
@@ -54,14 +48,15 @@ export default function ProfilePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
+      <div className="min-h-screen bg-white dark:bg-black py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 animate-pulse">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-6 bg-black/10 dark:bg-white/10 w-32 mb-8"></div>
+          <div className="border border-black/10 dark:border-white/10 p-8">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-black/10 dark:bg-white/10"></div>
               <div className="space-y-2">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
+                <div className="h-5 bg-black/10 dark:bg-white/10 w-32"></div>
+                <div className="h-4 bg-black/10 dark:bg-white/10 w-48"></div>
               </div>
             </div>
           </div>
@@ -71,36 +66,40 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
+    <div className="min-h-screen bg-white dark:bg-black py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your account information</p>
+        {/* Header */}
+        <div className="mb-10">
+          <p className="text-red-600 font-bold text-xs uppercase tracking-widest mb-2">Account</p>
+          <h1 className="text-3xl font-black text-black dark:text-white leading-none">Profile</h1>
+          <p className="text-black/40 dark:text-white/40 text-sm mt-1">Manage your account information</p>
         </div>
 
         {/* Profile Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="border border-black/10 dark:border-white/10">
 
           {/* Cover */}
-          <div className="h-24 bg-gradient-to-br from-violet-600 to-indigo-600"></div>
+          <div className="h-16 bg-black dark:bg-red-600/20 relative">
+            <div className="absolute top-0 left-0 w-full h-full opacity-10"
+              style={{ backgroundImage: 'repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%)', backgroundSize: '10px 10px' }}>
+            </div>
+          </div>
 
-          {/* Avatar + Info */}
           <div className="px-8 pb-8">
-            <div className="flex items-end justify-between -mt-10 mb-6">
-              <div className="w-20 h-20 rounded-2xl border-4 border-white dark:border-gray-900 overflow-hidden bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+            {/* Avatar */}
+            <div className="flex items-end justify-between -mt-8 mb-8">
+              <div className="w-16 h-16 border-4 border-white dark:border-black overflow-hidden bg-black dark:bg-red-600 flex items-center justify-center">
                 {user?.photoURL ? (
                   <img src={user.photoURL} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl font-bold text-violet-600">
-                    {user?.name?.charAt(0)?.toUpperCase()}
-                  </span>
+                  <span className="text-xl font-black text-white">{user?.name?.charAt(0)?.toUpperCase()}</span>
                 )}
               </div>
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="px-4 py-2 border border-black/20 dark:border-white/20 text-black dark:text-white font-bold text-xs hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors uppercase tracking-wider"
                 >
                   Edit Profile
                 </button>
@@ -108,117 +107,90 @@ export default function ProfilePage() {
             </div>
 
             {!isEditing ? (
-              // View Mode
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.name}</h2>
-                  <p className="text-gray-500 dark:text-gray-400">{user?.email}</p>
+                  <h2 className="text-2xl font-black text-black dark:text-white">{user?.name}</h2>
+                  <p className="text-black/40 dark:text-white/40 text-sm">{user?.email}</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Full Name</p>
-                    <p className="text-gray-900 dark:text-white font-medium">{user?.name}</p>
+                {/* Info Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10">
+                  <div className="bg-white dark:bg-black p-4">
+                    <p className="text-xs font-bold text-black/40 dark:text-white/40 uppercase tracking-wider mb-1">Full Name</p>
+                    <p className="text-black dark:text-white font-semibold text-sm">{user?.name}</p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Email</p>
-                    <p className="text-gray-900 dark:text-white font-medium truncate">{user?.email}</p>
+                  <div className="bg-white dark:bg-black p-4">
+                    <p className="text-xs font-bold text-black/40 dark:text-white/40 uppercase tracking-wider mb-1">Email</p>
+                    <p className="text-black dark:text-white font-semibold text-sm truncate">{user?.email}</p>
                   </div>
                   {user?.photoURL && (
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 sm:col-span-2">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Photo URL</p>
-                      <p className="text-gray-900 dark:text-white text-sm truncate">{user.photoURL}</p>
+                    <div className="bg-white dark:bg-black p-4 sm:col-span-2">
+                      <p className="text-xs font-bold text-black/40 dark:text-white/40 uppercase tracking-wider mb-1">Photo URL</p>
+                      <p className="text-black dark:text-white text-sm truncate">{user.photoURL}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Quick Links */}
-                <div className="grid grid-cols-2 gap-3 pt-4">
+                <div className="grid grid-cols-2 gap-px bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10">
                   <button
                     onClick={() => router.push('/my-ideas')}
-                    className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                    className="flex items-center gap-3 p-5 bg-white dark:bg-black hover:bg-black dark:hover:bg-white group transition-colors"
                   >
                     <span className="text-2xl">💡</span>
                     <div className="text-left">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">My Ideas</p>
-                      <p className="text-xs text-gray-400">View all your ideas</p>
+                      <p className="text-sm font-black text-black dark:text-white group-hover:text-white dark:group-hover:text-black transition-colors">My Ideas</p>
+                      <p className="text-xs text-black/40 dark:text-white/40 group-hover:text-white/60 dark:group-hover:text-black/60 transition-colors">View all your ideas</p>
                     </div>
                   </button>
                   <button
                     onClick={() => router.push('/my-interactions')}
-                    className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                    className="flex items-center gap-3 p-5 bg-white dark:bg-black hover:bg-black dark:hover:bg-white group transition-colors"
                   >
                     <span className="text-2xl">💬</span>
                     <div className="text-left">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">Interactions</p>
-                      <p className="text-xs text-gray-400">View your comments</p>
+                      <p className="text-sm font-black text-black dark:text-white group-hover:text-white dark:group-hover:text-black transition-colors">Interactions</p>
+                      <p className="text-xs text-black/40 dark:text-white/40 group-hover:text-white/60 dark:group-hover:text-black/60 transition-colors">View your comments</p>
                     </div>
                   </button>
                 </div>
               </div>
             ) : (
-              // Edit Mode
               <form onSubmit={handleUpdate} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
+                  <label className={labelClass}>Full Name <span className="text-red-500 normal-case">*</span></label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                    className={inputClass}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Email <span className="text-gray-400 font-normal">(cannot be changed)</span>
-                  </label>
+                  <label className={labelClass}>Email <span className="text-black/30 dark:text-white/30 normal-case font-normal">(cannot be changed)</span></label>
                   <input
                     type="email"
                     value={user?.email}
                     disabled
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 cursor-not-allowed text-sm"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Photo URL <span className="text-gray-400 font-normal">(optional)</span>
-                  </label>
+                  <label className={labelClass}>Photo URL <span className="text-black/30 dark:text-white/30 normal-case font-normal">(optional)</span></label>
                   <input
                     type="url"
                     value={formData.image}
                     onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
                     placeholder="https://example.com/photo.jpg"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                    className={inputClass}
                   />
                   {formData.image && (
-                    <img
-                      src={formData.image}
-                      alt="Preview"
-                      className="mt-3 w-16 h-16 rounded-xl object-cover"
-                      onError={(e) => e.target.style.display = 'none'}
-                    />
+                    <img src={formData.image} alt="Preview" className="mt-3 w-14 h-14 object-cover border border-black/10 dark:border-white/10" onError={(e) => e.target.style.display = 'none'} />
                   )}
                 </div>
-
                 <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditing(false)}
-                    className="flex-1 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="flex-1 py-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white rounded-xl transition-colors font-medium"
-                  >
-                    {isLoading ? 'Saving...' : 'Save Changes'}
-                  </button>
+                  <button type="button" onClick={() => setIsEditing(false)} className="flex-1 py-3 border border-black/20 dark:border-white/20 text-black dark:text-white font-bold text-sm hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Cancel</button>
+                  <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-black dark:bg-red-600 hover:bg-black/80 dark:hover:bg-red-700 disabled:opacity-50 text-white font-bold text-sm transition-colors">{isLoading ? 'Saving...' : 'Save Changes'}</button>
                 </div>
               </form>
             )}
