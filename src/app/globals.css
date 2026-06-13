@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
@@ -7,9 +8,9 @@
   --surface-2: #eeeeee;
   --border: #e0e0e0;
   --muted: #666666;
-  --primary: #000000;
-  --primary-hover: #222222;
-  --accent: #000000;
+  --primary: #dc2626; /* A nice punchy Tailwind Red-600 */
+  --primary-hover: #b91c1c; /* Darker Red for hover states */
+  --accent: #dc2626;
 }
 
 .dark {
