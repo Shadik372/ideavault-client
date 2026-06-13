@@ -1,17 +1,21 @@
 'use client';
 
-import { useState , useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const CATEGORIES = ['Tech', 'Health', 'AI', 'Education', 'Finance', 'Environment', 'Other'];
 
+const inputClass = 'w-full px-4 py-3 border border-black/20 dark:border-white/20 bg-white dark:bg-black text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-black dark:focus:border-white text-sm transition-colors';
+const labelClass = 'block text-xs font-bold text-black/60 dark:text-white/60 uppercase tracking-wider mb-2';
+
 export default function AddIdeaPage() {
   const { user, getToken } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState(false);
+  const [tagInputValue, setTagInputValue] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     shortDescription: '',
@@ -36,10 +40,10 @@ export default function AddIdeaPage() {
 
   const handleAddTag = (e) => {
     e.preventDefault();
-    const tag = tagInput.trim().toLowerCase();
+    const tag = tagInputValue.trim().toLowerCase();
     if (tag && !formData.tags.includes(tag) && formData.tags.length < 5) {
       setFormData(prev => ({ ...prev, tags: [...prev.tags, tag] }));
-      setTagInput('');
+      setTagInputValue('');
     }
   };
 
@@ -86,43 +90,43 @@ export default function AddIdeaPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
+    <div className="min-h-screen bg-white dark:bg-black py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Share Your Idea</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
+        <div className="mb-10">
+          <p className="text-red-600 font-bold text-xs uppercase tracking-widest mb-2">New Submission</p>
+          <h1 className="text-3xl font-black text-black dark:text-white leading-none">Share Your Idea</h1>
+          <p className="text-black/50 dark:text-white/50 mt-2 text-sm">
             Fill in the details below to submit your startup idea to the community
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
 
           {/* Basic Info */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 space-y-5">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-3">
-              Basic Information
-            </h2>
+          <div className="border border-black/10 dark:border-white/10 p-6 space-y-5">
+            <div className="flex items-center gap-3 pb-4 border-b border-black/10 dark:border-white/10">
+              <div className="w-1 h-5 bg-red-600"></div>
+              <h2 className="text-sm font-black text-black dark:text-white uppercase tracking-wider">
+                Basic Information
+              </h2>
+            </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Idea Title <span className="text-red-500">*</span>
-              </label>
+              <label className={labelClass}>Idea Title <span className="text-red-500 normal-case">*</span></label>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. AI-powered personal finance tracker"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Short Description <span className="text-red-500">*</span>
-              </label>
+              <label className={labelClass}>Short Description <span className="text-red-500 normal-case">*</span></label>
               <input
                 type="text"
                 name="shortDescription"
@@ -130,34 +134,30 @@ export default function AddIdeaPage() {
                 onChange={handleChange}
                 placeholder="One sentence summary of your idea"
                 maxLength={150}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                className={inputClass}
               />
-              <p className="text-xs text-gray-400 mt-1 text-right">{formData.shortDescription.length}/150</p>
+              <p className="text-xs text-black/30 dark:text-white/30 mt-1 text-right">{formData.shortDescription.length}/150</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Detailed Description
-              </label>
+              <label className={labelClass}>Detailed Description <span className="text-black/30 dark:text-white/30 normal-case font-normal">(optional)</span></label>
               <textarea
                 name="detailedDescription"
                 value={formData.detailedDescription}
                 onChange={handleChange}
                 placeholder="Describe your idea in detail..."
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition resize-none"
+                className={`${inputClass} resize-none`}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Category <span className="text-red-500">*</span>
-              </label>
+              <label className={labelClass}>Category <span className="text-red-500 normal-case">*</span></label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                className={inputClass}
               >
                 <option value="">Select a category</option>
                 {CATEGORIES.map(cat => (
@@ -167,22 +167,20 @@ export default function AddIdeaPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Tags <span className="text-gray-400 font-normal">(optional, max 5)</span>
-              </label>
+              <label className={labelClass}>Tags <span className="text-black/30 dark:text-white/30 normal-case font-normal">(optional, max 5)</span></label>
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
+                  value={tagInputValue}
+                  onChange={(e) => setTagInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddTag(e)}
                   placeholder="Add a tag and press Enter"
-                  className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                  className={inputClass}
                 />
                 <button
                   onClick={handleAddTag}
                   type="button"
-                  className="px-4 py-3 bg-violet-100 dark:bg-violet-900/30 text-violet-600 rounded-xl hover:bg-violet-200 transition-colors font-medium"
+                  className="px-4 py-3 bg-black dark:bg-white text-white dark:text-black font-bold text-sm hover:bg-black/80 dark:hover:bg-white/80 transition-colors"
                 >
                   Add
                 </button>
@@ -190,9 +188,9 @@ export default function AddIdeaPage() {
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {formData.tags.map(tag => (
-                    <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 rounded-full text-sm">
+                    <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-black/5 dark:bg-white/5 text-black dark:text-white text-xs font-semibold">
                       #{tag}
-                      <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-500 ml-1">×</button>
+                      <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-500 ml-1 font-bold">×</button>
                     </span>
                   ))}
                 </div>
@@ -200,82 +198,75 @@ export default function AddIdeaPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Image URL <span className="text-gray-400 font-normal">(optional)</span>
-              </label>
+              <label className={labelClass}>Image URL <span className="text-black/30 dark:text-white/30 normal-case font-normal">(optional)</span></label>
               <input
                 type="url"
                 name="imageURL"
                 value={formData.imageURL}
                 onChange={handleChange}
                 placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                className={inputClass}
               />
               {formData.imageURL && (
-                <img src={formData.imageURL} alt="Preview" className="mt-3 h-32 w-full object-cover rounded-xl" onError={(e) => e.target.style.display = 'none'} />
+                <img src={formData.imageURL} alt="Preview" className="mt-3 h-32 w-full object-cover" onError={(e) => e.target.style.display = 'none'} />
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Estimated Budget <span className="text-gray-400 font-normal">(optional)</span>
-              </label>
+              <label className={labelClass}>Estimated Budget <span className="text-black/30 dark:text-white/30 normal-case font-normal">(optional)</span></label>
               <input
                 type="text"
                 name="estimatedBudget"
                 value={formData.estimatedBudget}
                 onChange={handleChange}
                 placeholder="e.g. $10,000 - $50,000"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                className={inputClass}
               />
             </div>
           </div>
 
           {/* Problem & Solution */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 space-y-5">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-3">
-              Problem & Solution
-            </h2>
+          <div className="border border-black/10 dark:border-white/10 p-6 space-y-5">
+            <div className="flex items-center gap-3 pb-4 border-b border-black/10 dark:border-white/10">
+              <div className="w-1 h-5 bg-red-600"></div>
+              <h2 className="text-sm font-black text-black dark:text-white uppercase tracking-wider">
+                Problem & Solution
+              </h2>
+            </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Target Audience <span className="text-red-500">*</span>
-              </label>
+              <label className={labelClass}>Target Audience <span className="text-red-500 normal-case">*</span></label>
               <input
                 type="text"
                 name="targetAudience"
                 value={formData.targetAudience}
                 onChange={handleChange}
                 placeholder="e.g. Small business owners, college students"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Problem Statement <span className="text-red-500">*</span>
-              </label>
+              <label className={labelClass}>Problem Statement <span className="text-red-500 normal-case">*</span></label>
               <textarea
                 name="problemStatement"
                 value={formData.problemStatement}
                 onChange={handleChange}
                 placeholder="What problem does your idea solve?"
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition resize-none"
+                className={`${inputClass} resize-none`}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Proposed Solution <span className="text-red-500">*</span>
-              </label>
+              <label className={labelClass}>Proposed Solution <span className="text-red-500 normal-case">*</span></label>
               <textarea
                 name="proposedSolution"
                 value={formData.proposedSolution}
                 onChange={handleChange}
                 placeholder="How does your idea solve the problem?"
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 transition resize-none"
+                className={`${inputClass} resize-none`}
               />
             </div>
           </div>
@@ -283,17 +274,17 @@ export default function AddIdeaPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-4 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-lg"
+            className="w-full py-4 bg-black dark:bg-red-600 text-white font-black text-sm hover:bg-black/80 dark:hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors uppercase tracking-wider"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 12 0 12h4z" />
                 </svg>
                 Submitting...
               </span>
-            ) : 'Submit Idea 🚀'}
+            ) : 'Submit Idea →'}
           </button>
         </form>
       </div>
