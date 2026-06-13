@@ -10,29 +10,6 @@ export function AuthProvider({ children }) {
   const { data: session, isPending: loading } = useSession();
   const [user, setUser] = useState(null);
 
-  // Update user state when session changes
-  useEffect(() => {
-    if (session?.user) {
-      const userData = {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        photoURL: session.user.image || session.user.photoURL || null,
-      };
-      setUser(userData);
-    } else if (!loading) {
-      setUser(null);
-    }
-  }, [session, loading]);
-
-  const getToken = async () => {
-    try {
-      return localStorage.getItem('ideavault_jwt') || null;
-    } catch {
-      return null;
-    }
-  };
-
   const generateJWT = async (email, name) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -42,10 +19,46 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, name }),
       });
       const data = await res.json();
-      if (data.token) localStorage.setItem('ideavault_jwt', data.token);
+      if (data.token) {
+        localStorage.setItem('ideavault_jwt', data.token);
+      }
       return data.token;
     } catch (error) {
       console.error('Failed to generate JWT:', error);
+      return null;
+    }
+  };
+
+  // Update user state when session changes AND sync JWT for Google Logins
+  useEffect(() => {
+    const syncSession = async () => {
+      if (session?.user) {
+        const userData = {
+          id: session.user.id,
+          name: session.user.name,
+          email: session.user.email,
+          photoURL: session.user.image || session.user.photoURL || null,
+        };
+        setUser(userData);
+
+        // THE FIX: If Google logged us in but we lack the API JWT, generate it silently!
+        const existingToken = localStorage.getItem('ideavault_jwt');
+        if (!existingToken) {
+          await generateJWT(session.user.email, session.user.name);
+        }
+      } else if (!loading) {
+        setUser(null);
+        localStorage.removeItem('ideavault_jwt'); // Clean up on logout
+      }
+    };
+
+    syncSession();
+  }, [session, loading]);
+
+  const getToken = async () => {
+    try {
+      return localStorage.getItem('ideavault_jwt') || null;
+    } catch {
       return null;
     }
   };
@@ -64,9 +77,7 @@ export function AuthProvider({ children }) {
       await generateJWT(email, name);
       toast.success('Registration successful!');
       
-      // Refresh the page to update session
       window.location.href = '/';
-      
       return result;
     } catch (error) {
       toast.error(error.message || 'Registration failed');
@@ -83,9 +94,7 @@ export function AuthProvider({ children }) {
       await generateJWT(email, result.data?.user?.name || '');
       toast.success('Login successful!');
       
-      // Refresh the page to update session
       window.location.href = '/';
-      
       return result;
     } catch (error) {
       toast.error(error.message || 'Login failed');
